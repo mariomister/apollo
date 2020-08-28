@@ -229,7 +229,6 @@ DECLARE_bool(use_s_curve_speed_smooth);
 DECLARE_bool(use_iterative_anchoring_smoother);
 DECLARE_bool(enable_parallel_trajectory_smoothing);
 
-DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
 DECLARE_bool(export_chart);
 DECLARE_bool(enable_record_debug);
@@ -269,7 +268,7 @@ DECLARE_bool(use_front_axe_center_in_path_planning);
 DECLARE_bool(use_road_boundary_from_map);
 
 // learning related
-DECLARE_int32(planning_learning_mode);
+DECLARE_bool(planning_offline_learning);
 DECLARE_string(planning_data_dir);
 DECLARE_string(planning_offline_bags);
 DECLARE_int32(learning_data_obstacle_history_time_sec);

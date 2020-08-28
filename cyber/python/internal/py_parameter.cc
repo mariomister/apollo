@@ -16,11 +16,10 @@
 
 #include "cyber/python/internal/py_parameter.h"
 
-#include <python3.6m/Python.h>
-
 #include <set>
 #include <string>
 
+#include <Python.h>
 #include "cyber/python/internal/py_cyber.h"
 
 using apollo::cyber::Parameter;
@@ -602,10 +601,10 @@ static PyMethodDef _cyber_parameter_methods[] = {
 PyMODINIT_FUNC PyInit__cyber_parameter_wrapper(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_parameter_wrapper",    // Module name.
-      "CyberParameter module",   // Module doc.
-      -1,                        // Module size.
-      _cyber_parameter_methods,  // Module methods.
+      "_cyber_parameter_wrapper",  // Module name.
+      "CyberParameter module",     // Module doc.
+      -1,                          // Module size.
+      _cyber_parameter_methods,    // Module methods.
       nullptr,
       nullptr,
       nullptr,

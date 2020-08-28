@@ -20,7 +20,7 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. /tmp/installers/installer_base.sh
+. ./installer_base.sh
 
 VERSION="3.12.3"
 
@@ -36,6 +36,9 @@ download_if_not_cached "$PKG_NAME" "$CHECKSUM" "$DOWNLOAD_LINK"
 
 tar xzf ${PKG_NAME}
 
+# https://developers.google.com/protocol-buffers/docs/reference/python-generated#cpp_impl
+export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
+
 pushd protobuf-${VERSION}
 mkdir cmake/build && cd cmake/build
 
@@ -44,19 +47,23 @@ mkdir cmake/build && cd cmake/build
 cmake .. \
     -DBUILD_SHARED_LIBS=ON \
     -Dprotobuf_BUILD_TESTS=OFF \
-    -DCMAKE_INSTALL_PREFIX:PATH="${SYSROOT_DIR}" \
+    -DCMAKE_INSTALL_PREFIX:PATH="/usr" \
     -DCMAKE_BUILD_TYPE=Release
 
-# ./configure --prefix=${SYSROOT_DIR}
+# ./configure --prefix=/usr
 make -j$(nproc)
 make install
 
 ldconfig
 
+cd ../../python
+# Cf. https://github.com/protocolbuffers/protobuf/tree/master/python
+python setup.py install --cpp_implementation
+
 popd
 
-ldconfig
-ok "Successfully installed protobuf-cpp, VERSION=${VERSION}"
+echo -e "\nexport PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp" | tee -a "${APOLLO_PROFILE}"
+ok "Successfully installed protobuf, VERSION=${VERSION}"
 
 # Clean up.
 rm -fr ${PKG_NAME}  protobuf-${VERSION}

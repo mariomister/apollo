@@ -27,6 +27,8 @@ DEFINE_string(chassis_detail_topic, "/apollo/canbus/chassis_detail",
               "chassis detail topic name");
 DEFINE_string(localization_topic, "/apollo/localization/pose",
               "localization topic name");
+DEFINE_string(planning_learning_data_topic, "/apollo/planning/learning_data",
+              "planning learning data");
 DEFINE_string(planning_trajectory_topic, "/apollo/planning",
               "planning trajectory topic name");
 DEFINE_string(planning_pad_topic, "/apollo/planning/pad",
@@ -209,25 +211,6 @@ DEFINE_string(v2x_trafficlight_topic, "/apollo/v2x/traffic_light",
 DEFINE_string(storytelling_topic, "/apollo/storytelling",
               "Storytelling topic.");
 
-// For pandora.
-DEFINE_string(pandora_pointcloud_topic,
-              "/apollo/sensor/pandora/hesai40/PointCloud2",
-              "pandora pointcloud topic name");
-DEFINE_string(pandora_camera_front_color_topic,
-              "/apollo/sensor/pandora/camera/front_color",
-              "pandora front color camera topic name");
-DEFINE_string(pandora_camera_right_gray_topic,
-              "/apollo/sensor/pandora/camera/right_gray",
-              "pandora right gray camera topic name");
-DEFINE_string(pandora_camera_left_gray_topic,
-              "/apollo/sensor/pandora/camera/left_gray",
-              "pandora left gray camera topic name");
-DEFINE_string(pandora_camera_front_gray_topic,
-              "/apollo/sensor/pandora/camera/front_gray",
-              "pandora front gray camera topic name");
-DEFINE_string(pandora_camera_back_gray_topic,
-              "/apollo/sensor/pandora/camera/back_gray",
-              "pandora back gray camera topic name");
 DEFINE_string(guardian_topic, "/apollo/guardian", "Guardian topic.");
 DEFINE_string(gnss_raw_data_topic, "/apollo/sensor/gnss/raw_data",
               "gnss raw data topic name");

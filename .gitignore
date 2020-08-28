@@ -8,6 +8,7 @@ bazel-*
 
 # Generated files
 *.result
+py_proto
 
 # Eclipse IDE files
 .project
@@ -73,3 +74,6 @@ docs/demo_guide/*.record
 tools/python_bin_path.sh
 .apollo.bazelrc
 .errors.log
+
+# Flamegraph files
+tools/FlameGraph

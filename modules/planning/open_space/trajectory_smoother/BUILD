@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -14,7 +15,8 @@ cc_library(
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
         ":dual_variable_warm_start_slack_osqp_interface",
-        "//modules/common/time",
+        "//cyber/common:log",
+        "//modules/common/util:perf_util",
     ],
 )
 
@@ -105,7 +107,7 @@ cc_library(
         ":distance_approach_ipopt_relax_end_interface",
         ":distance_approach_ipopt_relax_end_slack_interface",
         "//cyber/common:log",
-        "//modules/common/time",
+        "//modules/common/util:perf_util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_cc_proto",
     ],
@@ -238,13 +240,12 @@ cc_library(
 
 cc_library(
     name = "distance_approach_ipopt_cuda_interface",
-    srcs = ["distance_approach_ipopt_cuda_interface.cc"] + select({
-        "//tools/platform:use_gpu": [
+    srcs = ["distance_approach_ipopt_cuda_interface.cc"] + if_gpu(
+        [
             "planning_block.h",
             ":planning_block",
         ],
-        "//conditions:default": [],
-    }),
+    ),
     hdrs = [
         "distance_approach_interface.h",
         "distance_approach_ipopt_cuda_interface.h",
@@ -301,6 +302,7 @@ cc_test(
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_ipopt_interface",
         "//cyber/common:log",
@@ -316,12 +318,12 @@ cc_test(
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_ipopt_cuda_interface",
         "//cyber/common:log",
         "@com_google_googletest//:gtest_main",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(
@@ -332,12 +334,12 @@ cc_test(
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_problem",
         "//cyber/common:log",
         "@com_google_googletest//:gtest_main",
-        "@local_config_cuda//cuda:cudart",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(

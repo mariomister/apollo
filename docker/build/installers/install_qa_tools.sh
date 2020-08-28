@@ -19,9 +19,10 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
-. /tmp/installers/installer_base.sh
+TARGET_ARCH="$(uname -m)"
 
 ## NOTE:
 ## buildifier/buildozer was moved into install_bazel.sh.
@@ -31,14 +32,33 @@ apt-get -y update && \
     cppcheck    \
     shellcheck  \
     lcov        \
-    valgrind    \
-    libgoogle-perftools4  # gperftools
+    valgrind
+
+# libgoogle-perftools4  # gperftools
+# PROFILER_SO="/usr/lib/${TARGET_ARCH}-linux-gnu/libprofiler.so"
+# if [ ! -e "${PROFILER_SO}" ]; then
+#    # libgoogle-perftools4: /usr/lib/x86_64-linux-gnu/libprofiler.so.0
+#    ln -s "${PROFILER_SO}.0" "${PROFILER_SO}"
+# fi
+
+bash ${CURR_DIR}/install_gperftools.sh
+
+bash ${CURR_DIR}/install_benchmark.sh
+
+# TechDoc generation
+bash ${CURR_DIR}/install_doxygen.sh
+
+# sphinx ?
 
 ## Pylint
-pip3_install pycodestyle
-pip3_install pyflakes
-pip3_install flake8
-# pip3_install pylint
+pip3_install pycodestyle \
+    pyflakes \
+    flake8 \
+    autopep8
+# pylint
+
+# shfmt
+bash ${CURR_DIR}/install_shfmt.sh
 
 # Clean up cache to reduce layer size.
 apt-get clean && \

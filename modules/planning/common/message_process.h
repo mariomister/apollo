@@ -23,6 +23,7 @@
 #include <chrono>
 #include <fstream>
 #include <list>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -33,6 +34,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -45,6 +47,9 @@ namespace planning {
 class MessageProcess {
  public:
   bool Init(const PlanningConfig& planning_config);
+  bool Init(const PlanningConfig& planning_config,
+            const std::shared_ptr<DependencyInjector>& injector);
+
   void Close();
 
   void OnChassis(const apollo::canbus::Chassis& chassis);
@@ -76,7 +81,8 @@ class MessageProcess {
 
   apollo::hdmap::LaneInfoConstPtr GetCurrentLane(
       const apollo::common::PointENU& position);
-  bool GetADCCurrentRoutingIndex(int* road_index, double* road_s);
+  bool GetADCCurrentRoutingIndex(int* adc_road_index, int* adc_passage_index,
+                                 double* adc_passage_s);
 
   int GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
 
@@ -85,16 +91,21 @@ class MessageProcess {
                                   ObstacleFeature* obstacle_feature);
 
   void GenerateObstaclePrediction(
+      const int frame_num,
       const apollo::prediction::PredictionObstacle& prediction_obstacle,
       const ADCCurrentInfo& adc_curr_info, ObstacleFeature* obstacle_feature);
 
   void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
 
-  bool GenerateLocalRoutingPassages(
-      std::vector<std::vector<std::pair<std::string, double>>>*
-          local_routing_passages);
+  bool GenerateLocalRouting(
+      const int frame_num,
+      RoutingResponseFeature* local_routing,
+      std::vector<std::string>* local_routing_lane_ids);
 
-  void GenerateRoutingFeature(LearningDataFrame* learning_data_frame);
+  void GenerateRoutingFeature(
+    const RoutingResponseFeature& local_routing,
+    const std::vector<std::string>& local_routing_lane_ids,
+    LearningDataFrame* learning_data_frame);
 
   void GenerateTrafficLightDetectionFeature(
       LearningDataFrame* learning_data_frame);
@@ -105,9 +116,10 @@ class MessageProcess {
 
   void GeneratePlanningTag(LearningDataFrame* learning_data_frame);
 
-  void GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
+  bool GenerateLearningDataFrame(LearningDataFrame* learning_data_frame);
 
  private:
+  std::shared_ptr<DependencyInjector> injector_;
   PlanningConfig planning_config_;
   std::chrono::time_point<std::chrono::system_clock> start_time_;
   std::ofstream log_file_;
@@ -127,6 +139,7 @@ class MessageProcess {
   double traffic_light_detection_message_timestamp_;
   std::vector<TrafficLightFeature> traffic_lights_;
   int total_learning_data_frame_num_ = 0;
+  double last_localization_message_timestamp_sec_ = 0.0;
 };
 
 }  // namespace planning

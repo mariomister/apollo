@@ -2,12 +2,8 @@
 TOP_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
 source ${TOP_DIR}/scripts/apollo.bashrc
 
+export APOLLO_BAZEL_DISTDIR="${APOLLO_CACHE_DIR}/distdir"
 export CYBER_PATH="${APOLLO_ROOT_DIR}/cyber"
-
-# FIXME(all): preconfigured in /etc/profile.d/apollo.sh
-export QT5_PATH="/usr/local/qt5"
-export QT_QPA_PLATFORM_PLUGIN_PATH=${QT5_PATH}/plugins
-add_to_path "${QT5_PATH}/bin"
 
 bazel_bin_path="${APOLLO_ROOT_DIR}/bazel-bin"
 cyber_bin_path="${bazel_bin_path}/cyber"

@@ -17,6 +17,7 @@
 #ifndef CYBER_RECORD_RECORD_READER_H_
 #define CYBER_RECORD_RECORD_READER_H_
 
+#include <limits>
 #include <memory>
 #include <set>
 #include <string>
@@ -68,7 +69,7 @@ class RecordReader : public RecordBase {
    * @return True for success, false for not.
    */
   bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
-                   uint64_t end_time = UINT64_MAX);
+                   uint64_t end_time = std::numeric_limits<uint64_t>::max());
 
   /**
    * @brief Reset the message index of record reader.

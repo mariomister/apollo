@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "NvInfer.h"
 #include "NvOnnxParser.h"
@@ -101,7 +101,7 @@ class TrajectoryImitationTensorRTInference : public ModelInference {
   bool DoInference(LearningDataFrame* learning_data_frame) override;
 
  private:
-   /**
+  /**
    * @brief inference a CONV_RNN model
    * @param learning_data_frame input and output intermediate for inference
    */
@@ -114,10 +114,10 @@ class TrajectoryImitationTensorRTInference : public ModelInference {
   bool DoCNNMODELInference(LearningDataFrame* learning_data_frame);
 
   /**
-   * @brief inference a CNN_LSTM model
+   * @brief inference a SELF_CNN_LSTM like model
    * @param learning_data_frame input and output intermediate for inference
    */
-  bool DoCNNLSTMMODELInference(LearningDataFrame* learning_data_frame);
+  bool DoSelfCNNLSTMMODELInference(LearningDataFrame* learning_data_frame);
 
   Logger g_logger_;
   nvinfer1::IExecutionContext* trt_context_;

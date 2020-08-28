@@ -124,9 +124,7 @@ inline void TransformFromPCLXYZI(
 inline void DownSampleCloudByVoxelGrid(
     const pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud_ptr,
     const pcl::PointCloud<pcl::PointXYZI>::Ptr& filtered_cloud_ptr,
-    float lx = 0.01f,
-    float ly = 0.01f,
-    float lz = 0.01f) {
+    float lx = 0.01f, float ly = 0.01f, float lz = 0.01f) {
   pcl::VoxelGrid<pcl::PointXYZI> voxel_grid;
   voxel_grid.setInputCloud(cloud_ptr);
   voxel_grid.setLeafSize(lx, ly, lz);
@@ -143,6 +141,5 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::lidar::PCLPointXYZIT,
                                       intensity)(double, timestamp, timestamp))
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::lidar::PCLPointXYZL,
-                                  (float, x, x)(float, y, y)(float, z,
-                                                             z)(uint32_t, label,
-                                                                label))
+                                  (float, x, x)(float, y, y)(float, z, z)(
+                                      std::uint32_t, label, label))

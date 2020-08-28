@@ -23,6 +23,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "modules/common/util/perf_util.h"
+
 namespace apollo {
 namespace planning {
 
@@ -44,7 +46,7 @@ bool DistanceApproachProblem::Solve(
     Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
     Eigen::MatrixXd* dual_n_result) {
   // TODO(QiL) : evaluate whether need to new it everytime
-  auto t_start = cyber::Time::Now().ToSecond();
+  PERF_BLOCK_START();
 
   DistanceApproachInterface* ptop = nullptr;
 
@@ -168,10 +170,7 @@ bool DistanceApproachProblem::Solve(
     ADEBUG << "*** The final value of the objective function is " << final_obj
            << '.';
 
-    auto t_end = cyber::Time::Now().ToSecond();
-
-    AINFO << "DistanceApproachProblem solving time in second : "
-          << t_end - t_start;
+    PERF_BLOCK_END("DistanceApproachProblemSolving");
   } else {
     /*
       return detailed failure information,

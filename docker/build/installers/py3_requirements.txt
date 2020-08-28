@@ -20,11 +20,15 @@ pyproj
 shapely
 matplotlib
 
+# Driver
+pyusb
+
 # Data format
 h5py
 utm
 
 # Learning
-opencv-python
+#opencv-python
 numpy
 scipy
+

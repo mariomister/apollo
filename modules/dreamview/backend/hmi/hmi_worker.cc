@@ -19,7 +19,9 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+
 #include "cyber/common/file.h"
+#include "cyber/proto/dag_conf.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
@@ -53,9 +55,10 @@ namespace {
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
 using apollo::common::KVDB;
-using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
+using apollo::cyber::Clock;
 using apollo::cyber::Node;
+using apollo::cyber::proto::DagConfig;
 using apollo::monitor::ComponentStatus;
 using apollo::monitor::SystemStatus;
 using google::protobuf::Map;
@@ -107,7 +110,7 @@ Map<std::string, std::string> ListFilesAsDict(std::string_view dir,
 template <class FlagType, class ValueType>
 void SetGlobalFlag(std::string_view flag_name, const ValueType& value,
                    FlagType* flag) {
-  static constexpr char kGlobalFlagfile[] =
+  constexpr char kGlobalFlagfile[] =
       "/apollo/modules/common/data/global_flagfile.txt";
   if (*flag != value) {
     *flag = value;
@@ -201,6 +204,24 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
     // Construct process_monitor_config.
     module.mutable_process_monitor_config()->add_command_keywords("mainboard");
     module.mutable_process_monitor_config()->add_command_keywords(first_dag);
+    // Construct module_monitor_config.
+    DagConfig dag_config;
+    for (const std::string& dag : cyber_module.dag_files()) {
+      if (!cyber::common::GetProtoFromFile(dag, &dag_config)) {
+        AERROR << "Unable to parse dag config file " << dag;
+        continue;
+      }
+      for (const auto& module_config : dag_config.module_config()) {
+        for (const auto& component : module_config.components()) {
+          module.mutable_module_monitor_config()->add_node_name(
+              component.config().name());
+        }
+        for (const auto& timer_component : module_config.timer_components()) {
+          module.mutable_module_monitor_config()->add_node_name(
+              timer_component.config().name());
+        }
+      }
+    }
   }
   mode.clear_cyber_modules();
   AINFO << "Loaded HMI mode: " << mode.DebugString();
@@ -540,8 +561,8 @@ void HMIWorker::ResetMode() const {
 }
 
 void HMIWorker::StatusUpdateThreadLoop() {
+  constexpr int kLoopIntervalMs = 200;
   while (!stop_) {
-    static constexpr int kLoopIntervalMs = 200;
     std::this_thread::sleep_for(std::chrono::milliseconds(kLoopIntervalMs));
     UpdateComponentStatus();
     bool status_changed = false;
@@ -553,7 +574,7 @@ void HMIWorker::StatusUpdateThreadLoop() {
     // If status doesn't change, check if we reached update interval.
     if (!status_changed) {
       static double next_update_time = 0;
-      const double now = apollo::common::time::Clock::NowInSeconds();
+      const double now = Clock::NowInSeconds();
       if (now < next_update_time) {
         continue;
       }
@@ -569,13 +590,13 @@ void HMIWorker::StatusUpdateThreadLoop() {
 }
 
 void HMIWorker::ResetComponentStatusTimer() {
-  last_status_received_s_ = cyber::Time::Now().ToSecond();
+  last_status_received_s_ = Clock::NowInSeconds();
   last_status_fingerprint_ = 0;
 }
 
 void HMIWorker::UpdateComponentStatus() {
-  static constexpr double kSecondsTillTimeout(2.5);
-  const double now = cyber::Time::Now().ToSecond();
+  constexpr double kSecondsTillTimeout(2.5);
+  const double now = Clock::NowInSeconds();
   if (now - last_status_received_s_.load() > kSecondsTillTimeout) {
     if (!monitor_timed_out_) {
       WLock wlock(status_mutex_);

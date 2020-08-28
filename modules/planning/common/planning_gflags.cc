@@ -196,7 +196,7 @@ DEFINE_bool(enable_trajectory_check, false,
 DEFINE_double(speed_lower_bound, -0.1, "The lowest speed allowed.");
 DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
 
-DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
+DEFINE_double(longitudinal_acceleration_lower_bound, -6.0,
               "The lowest longitudinal acceleration allowed.");
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
               "The highest longitudinal acceleration allowed.");
@@ -469,8 +469,6 @@ DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
 
-DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
-            "Use OSQP optimizer for reference line optimization.");
 DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
 
@@ -535,17 +533,13 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
 
 DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
 
+DEFINE_bool(planning_offline_learning, false,
+            "offline learning. read record files and dump learning_data");
 DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
               "Prefix of files to store feature data");
 DEFINE_string(planning_offline_bags, "",
               "a list of source files or directories for offline mode. "
               "The items need to be separated by colon ':'. ");
-DEFINE_int32(planning_learning_mode, 0,
-             "0: no learning "
-             "1: offline learning. read record files and dump learning_data "
-             "   to <record file>.<n>.bin "
-             "2: online learning(e2e) "
-             "3: online learning(hybrid)");
 DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
              "time sec (second) of history trajectory points for a obstacle");
 DEFINE_int32(learning_data_frame_num_per_file, 100,
